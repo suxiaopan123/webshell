@@ -1,0 +1,17 @@
+name: WebShell
+options:
+  bundleIdPrefix: com.webshell
+  deploymentTarget: "13.0"
+targets:
+  WebShell:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.webshell.app
+        INFOPLIST_FILE: App/Info.plist
+        CODE_SIGNING_ALLOWED: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.0"

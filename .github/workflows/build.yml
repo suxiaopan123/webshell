@@ -1,0 +1,30 @@
+name: build-ipa
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安装 xcodegen
+        run: brew install xcodegen
+      - name: 生成 Xcode 工程
+        run: cd ios_shell && xcodegen
+      - name: 编译（不签名）
+        run: >
+          cd ios_shell && xcodebuild
+          -scheme WebShell -configuration Release -sdk iphoneos
+          CODE_SIGNING_ALLOWED=NO
+          -derivedDataPath build build
+      - name: 打包成 IPA
+        run: |
+          cd ios_shell
+          rm -rf Payload WebShell.ipa
+          mkdir Payload
+          cp -r build/Build/Products/Release-iphoneos/WebShell.app Payload/
+          zip -r WebShell.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebShell-ipa
+          path: ios_shell/WebShell.ipa
