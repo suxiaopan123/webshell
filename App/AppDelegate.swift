@@ -3,6 +3,7 @@ import WebKit
 
 struct ShellCfg: Decodable { let url: String }
 
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
