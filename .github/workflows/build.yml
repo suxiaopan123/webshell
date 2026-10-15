@@ -10,16 +10,15 @@ jobs:
       - name: 安装 xcodegen
         run: brew install xcodegen
       - name: 生成 Xcode 工程
-        run: cd ios_shell && xcodegen
+        run: xcodegen
       - name: 编译（不签名）
         run: >
-          cd ios_shell && xcodebuild
+          xcodebuild
           -scheme WebShell -configuration Release -sdk iphoneos
           CODE_SIGNING_ALLOWED=NO
           -derivedDataPath build build
       - name: 打包成 IPA
         run: |
-          cd ios_shell
           rm -rf Payload WebShell.ipa
           mkdir Payload
           cp -r build/Build/Products/Release-iphoneos/WebShell.app Payload/
@@ -27,4 +26,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: WebShell-ipa
-          path: ios_shell/WebShell.ipa
+          path: WebShell.ipa
