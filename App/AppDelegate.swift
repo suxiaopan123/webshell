@@ -28,6 +28,8 @@ class WebVC: UIViewController, WKNavigationDelegate {
         "unionpaysecure.com", "mobile.unionpay.com", "95516.com",
     ]
 
+    private var splash: UIView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // superview 用红色背景，状态栏区域颜色跟 uni-app 导航栏一致
@@ -35,28 +37,42 @@ class WebVC: UIViewController, WKNavigationDelegate {
 
         let cfg = WKWebViewConfiguration()
         cfg.preferences.javaScriptEnabled = true
-        // 注入 CSS：保险起见，给常见导航栏 class 加 safe-area padding
-        let css = """
-        .uni-page-head, .uni-navbar, header, [class*="navbar"], [class*="nav-bar"] {
-            padding-top: env(safe-area-inset-top) !important;
-        }
-        """
-        let js = "var s=document.createElement('style');s.textContent=\(css.debugDescription);document.head.appendChild(s);"
-        cfg.userContentController.addUserScript(
-            WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-        )
 
-        web = WKWebView(frame: view.bounds, configuration: cfg)
-        web.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        // 自动避开 safe-area：红色导航栏自然出现在状态栏下方
-        web.scrollView.contentInsetAdjustmentBehavior = .always
-        // 禁用下拉橡皮筋，避免错位
-        web.scrollView.bounces = false
+        web = WKWebView(frame: .zero, configuration: cfg)
         web.navigationDelegate = self
+        web.scrollView.bounces = false
+        web.scrollView.contentInsetAdjustmentBehavior = .never
         web.isOpaque = false
         web.backgroundColor = .white
+        web.alpha = 0  // 加载完成前先隐藏，避免白屏闪烁
         view.addSubview(web)
+
+        // 启动屏（白底 + 加载提示），避免冷启动白屏
+        let sp = UIView(frame: view.bounds)
+        sp.backgroundColor = .white
+        sp.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        let label = UILabel()
+        label.text = "加载中…"
+        label.textColor = UIColor(white: 0.4, alpha: 1.0)
+        label.font = .systemFont(ofSize: 16)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        sp.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: sp.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: sp.centerYAnchor),
+        ])
+        view.addSubview(sp)
+        splash = sp
+
         loadEntry()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // WebView 物理上避开 safe-area.top：红色 fixed 导航栏自然出现在状态栏下方
+        let top = view.safeAreaInsets.top
+        web.frame = CGRect(x: 0, y: top, width: view.bounds.width, height: view.bounds.height - top)
     }
 
     private func loadEntry() {
@@ -113,5 +129,16 @@ class WebVC: UIViewController, WKNavigationDelegate {
         }
         webView.load(navigationAction.request)
         return nil
+    }
+
+    // 页面加载完成：显示 WebView，隐藏启动屏
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        UIView.animate(withDuration: 0.2) {
+            webView.alpha = 1
+            self.splash?.alpha = 0
+        } completion: { _ in
+            self.splash?.removeFromSuperview()
+            self.splash = nil
+        }
     }
 }
