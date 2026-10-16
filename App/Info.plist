@@ -39,5 +39,50 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>alipay</string>
+		<string>alipays</string>
+		<string>alipayqr</string>
+		<string>alipayauth</string>
+		<string>weixin</string>
+		<string>wechat</string>
+		<string>weixinULAPI</string>
+		<string>mqq</string>
+		<string>mqqapi</string>
+		<string>qq</string>
+		<string>tim</string>
+		<string>taobao</string>
+		<string>tmall</string>
+		<string>jd</string>
+		<string>openapp.jdmobile</string>
+		<string>pinduoduo</string>
+		<string>snssdk1128</string>
+		<string>sinaweibo</string>
+		<string>weibosdk</string>
+		<string>weibosdk2.5</string>
+		<string>youku</string>
+		<string>iqiyi</string>
+		<string>bilibili</string>
+		<string>imeituan</string>
+		<string>dianping</string>
+		<string>eleme</string>
+		<string>ctrip</string>
+		<string>qunar</string>
+		<string>diditaxi</string>
+		<string>didi</string>
+		<string>kwai</string>
+		<string>kuaishou</string>
+		<string>xhsdiscover</string>
+		<string>zhihu</string>
+		<string>baiduboxapp</string>
+		<string>ucbrowser</string>
+		<string>qqmusic</string>
+		<string>neteasemusic</string>
+		<string>kugou</string>
+		<string>alipayshare</string>
+		<string>dingtalk</string>
+		<string>work.weixin</string>
+	</array>
 </dict>
 </plist>
