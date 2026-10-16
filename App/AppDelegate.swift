@@ -30,12 +30,31 @@ class WebVC: UIViewController, WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        web = WKWebView(frame: view.bounds)
+        // superview 用红色背景，状态栏区域颜色跟 uni-app 导航栏一致
+        view.backgroundColor = UIColor(red: 0.91, green: 0.23, blue: 0.20, alpha: 1.0)
+
+        let cfg = WKWebViewConfiguration()
+        cfg.preferences.javaScriptEnabled = true
+        // 注入 CSS：保险起见，给常见导航栏 class 加 safe-area padding
+        let css = """
+        .uni-page-head, .uni-navbar, header, [class*="navbar"], [class*="nav-bar"] {
+            padding-top: env(safe-area-inset-top) !important;
+        }
+        """
+        let js = "var s=document.createElement('style');s.textContent=\(css.debugDescription);document.head.appendChild(s);"
+        cfg.userContentController.addUserScript(
+            WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+        )
+
+        web = WKWebView(frame: view.bounds, configuration: cfg)
         web.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        web.scrollView.contentInsetAdjustmentBehavior = .never
-        web.configuration.preferences.javaScriptEnabled = true
+        // 自动避开 safe-area：红色导航栏自然出现在状态栏下方
+        web.scrollView.contentInsetAdjustmentBehavior = .always
+        // 禁用下拉橡皮筋，避免错位
+        web.scrollView.bounces = false
         web.navigationDelegate = self
+        web.isOpaque = false
+        web.backgroundColor = .white
         view.addSubview(web)
         loadEntry()
     }
